@@ -62,7 +62,7 @@ static void epd_draw_pixel_area(int x, int y, uint8_t color, uint8_t *framebuffe
  * @param buff Pointer to buffer to store the read data
  * @param nd   Number of bytes to read
  */
-static uint32_t feed_buffer(JDEC *jd, uint8_t *buff, uint32_t nd);
+static UINT feed_buffer(JDEC *jd, BYTE *buff, UINT nd);
 
 /**
  * @brief User defined call-back function to output decoded RGB bitmap in
@@ -72,7 +72,7 @@ static uint32_t feed_buffer(JDEC *jd, uint8_t *buff, uint32_t nd);
  * @param bitmap Bitmap data to be output
  * @param rect   Rectangular region to output
  */
-static uint32_t tjd_output(JDEC *jd, void *bitmap, JRECT *rect);
+static UINT tjd_output(JDEC *jd, void *bitmap, JRECT *rect);
 
 /**
  * @brief This function opens jpeg_buf Jpeg image file and primes the decoder
@@ -299,10 +299,10 @@ static void epd_draw_pixel_area(int x, int y, uint8_t color, uint8_t *framebuffe
 }
 
 
-static uint32_t feed_buffer(JDEC *jd, uint8_t *buff, uint32_t nd)
+static UINT feed_buffer(JDEC *jd, BYTE *buff, UINT nd)
 {
     uint8_t *device = (uint8_t *)jd->device;
-    uint32_t count = 0;
+    UINT count = 0;
     while (count < nd)
     {
         if (buff != NULL)
@@ -317,12 +317,12 @@ static uint32_t feed_buffer(JDEC *jd, uint8_t *buff, uint32_t nd)
 }
 
 
-static uint32_t tjd_output(JDEC *jd, void *bitmap, JRECT *rect)
+static UINT tjd_output(JDEC *jd, void *bitmap, JRECT *rect)
 {
     esp_task_wdt_reset();
 
-    uint32_t w = rect->right - rect->left + 1;
-    uint32_t h = rect->bottom - rect->top + 1;
+    UINT w = rect->right - rect->left + 1;
+    UINT h = rect->bottom - rect->top + 1;
     uint8_t *bitmap_ptr = (uint8_t *)bitmap;
 
     // printf("right: %d, left: %d, bottom: %d, top: %d\n", rect->right, rect->left, rect->bottom, rect->top);

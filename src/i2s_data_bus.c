@@ -6,11 +6,16 @@
 #include "i2s_data_bus.h"
 
 #include <driver/periph_ctrl.h>
+#include <driver/gpio.h>
 #include <esp_heap_caps.h>
 #include <rom/lldesc.h>
 #include <soc/i2s_reg.h>
 #include <soc/i2s_struct.h>
 #include <soc/rtc.h>
+#include <soc/gpio_periph.h>
+#include <soc/io_mux_reg.h>
+#include <esp_rom_gpio.h>
+#include <hal/gpio_hal.h>
 #include "esp_lcd_panel_io.h"
 #include "esp_err.h"
 #include "esp_log.h"
@@ -364,6 +369,7 @@ void i2s_bus_init(i2s_bus_config *cfg)
     ESP_LOGI(TAG, "Initialize Intel 8080 bus");
     esp_lcd_i80_bus_handle_t i80_bus = NULL;
     esp_lcd_i80_bus_config_t bus_config = {
+        .clk_src = LCD_CLK_SRC_DEFAULT,
         .dc_gpio_num = cfg->start_pulse,
         .wr_gpio_num = cfg->clock,
         .data_gpio_nums = {

@@ -8,6 +8,7 @@
 #include "rmt_pulse.h"
 
 #include <xtensa/core-macros.h>
+#include <soc/gpio_struct.h>
 
 #include <string.h>
 
