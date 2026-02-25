@@ -263,17 +263,11 @@ void IRAM_ATTR calc_epd_input_4bpp(uint32_t *line_data, uint8_t *epd_input,
         uint16_t v2 = *(line_data_16++);
         uint16_t v3 = *(line_data_16++);
         uint16_t v4 = *(line_data_16++);
-#if USER_I2S_REG
-        uint32_t pixel = conversion_lut[v1] << 16 |
-                         conversion_lut[v2] << 24 |
-                         conversion_lut[v3] |
-                         conversion_lut[v4] << 8;
-#else
+        /* Same byte order for both paths so panel receives correct pixel order. */
         uint32_t pixel = (conversion_lut[v1]) << 0  |
                          (conversion_lut[v2]) << 8  |
                          (conversion_lut[v3]) << 16 |
                          (conversion_lut[v4]) << 24;
-#endif
         wide_epd_input[j] = pixel;
     }
 }
@@ -1044,6 +1038,10 @@ static void IRAM_ATTR feed_display(OutputParams *params)
         xQueueReceive(output_queue, output, portMAX_DELAY);
         calc_epd_input_4bpp((uint32_t *)output, epd_get_current_buffer(),
                             params->frame, conversion_lut);
+#if CONFIG_IDF_TARGET_ESP32
+        /* Reorder 32-bit words for I2S FIFO order (register-based data bus). */
+        reorder_line_buffer((uint32_t *)epd_get_current_buffer());
+#endif
         write_row(contrast_lut[params->frame]);
     }
     if (!skipping)

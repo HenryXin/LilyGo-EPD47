@@ -24,7 +24,13 @@
 /***        macro definitions                                               ***/
 /******************************************************************************/
 
+/* Use register-based I2S for ESP32 (t5-4-7): correct STH timing for EPD.
+ * Use esp_lcd I80 for ESP32-S3 (t5-4-7-plus). */
+#if defined(CONFIG_IDF_TARGET_ESP32)
+#define USER_I2S_REG 1
+#else
 #define USER_I2S_REG 0
+#endif
 
 /******************************************************************************/
 /***        type definitions                                                ***/
@@ -369,7 +375,7 @@ void i2s_bus_init(i2s_bus_config *cfg)
     ESP_LOGI(TAG, "Initialize Intel 8080 bus");
     esp_lcd_i80_bus_handle_t i80_bus = NULL;
     esp_lcd_i80_bus_config_t bus_config = {
-        .clk_src = LCD_CLK_SRC_DEFAULT,
+        .clk_src = LCD_CLK_SRC_XTAL,
         .dc_gpio_num = cfg->start_pulse,
         .wr_gpio_num = cfg->clock,
         .data_gpio_nums = {
@@ -410,6 +416,7 @@ void i2s_bus_init(i2s_bus_config *cfg)
 
 void i2s_deinit()
 {
+#if USER_I2S_REG
     esp_intr_free(gI2S_intr_handle);
 
     free(i2s_state.buf_a);
@@ -418,6 +425,7 @@ void i2s_deinit()
     free((void *)i2s_state.dma_desc_b);
 
     periph_module_disable(PERIPH_I2S1_MODULE);
+#endif
 }
 
 /******************************************************************************/
